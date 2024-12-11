@@ -1,0 +1,62 @@
+Index: src/components/AgentForm.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>'use client'\n\nimport { useFormStatus } from 'react-dom'\nimport { Button } from '@/components/ui/button'\nimport { Input } from '@/components/ui/input'\nimport { Label } from '@/components/ui/label'\nimport { Dialog, DialogTitle, DialogContent } from '@mui/material'\nimport { useAgents } from '@/lib/context/AgentContext'\nimport {Agent, AgentFormData} from '@/lib/types'\n\ninterface AgentFormProps {\n  mode: 'add' | 'edit'\n  initialData?: Agent\n  open: boolean\n  onClose: () => void\n}\n\nfunction SubmitButton() {\n  const { pending } = useFormStatus()\n  return (\n    <Button type=\"submit\" disabled={pending}>\n      {pending ? 'Saving...' : 'Save'}\n    </Button>\n  )\n}\n\nexport function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) {\n  const { addAgent } = useAgents()\n\n  const submitAction = async (formData: FormData) => {\n    const data: AgentFormData = {\n      name: formData.get('name') as string,\n      email: formData.get('email') as string,\n      status: formData.get('status') as 'active' | 'inactive',\n    }\n    \n    await addAgent(data)\n    onClose()\n  }\n\n  return (\n    <Dialog \n      open={open} \n      onClose={onClose}\n      maxWidth=\"sm\"\n      fullWidth\n    >\n      <DialogTitle>\n        {mode === 'add' ? 'Add New Agent' : 'Edit Agent'}\n      </DialogTitle>\n      <DialogContent>\n        <form action={submitAction} className=\"space-y-4 pt-4\">\n          <div className=\"space-y-2\">\n            <Label htmlFor=\"name\">Name</Label>\n            <Input\n              id=\"name\"\n              name=\"name\"\n              defaultValue={initialData?.name}\n              required\n            />\n          </div>\n          <div className=\"space-y-2\">\n            <Label htmlFor=\"email\">Email</Label>\n            <Input\n              id=\"email\"\n              name=\"email\"\n              type=\"email\"\n              defaultValue={initialData?.email}\n              required\n            />\n          </div>\n          <div className=\"space-y-2\">\n            <Label htmlFor=\"status\">Status</Label>\n            <select\n              id=\"status\"\n              name=\"status\"\n              defaultValue={initialData?.status ?? 'active'}\n              className=\"w-full border rounded-md p-2\"\n            >\n              <option value=\"active\">Active</option>\n              <option value=\"inactive\">Inactive</option>\n            </select>\n          </div>\n          <div className=\"flex justify-end space-x-2 pt-4\">\n            <Button type=\"button\" variant=\"outline\" onClick={onClose}>\n              Cancel\n            </Button>\n            <SubmitButton />\n          </div>\n        </form>\n      </DialogContent>\n    </Dialog>\n  )\n} 
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/components/AgentForm.tsx b/src/components/AgentForm.tsx
+--- a/src/components/AgentForm.tsx	(revision 4e4eb026d1015e666f1e250f32cc52a2ace6ffa2)
++++ b/src/components/AgentForm.tsx	(date 1733959874961)
+@@ -6,7 +6,7 @@
+ import { Label } from '@/components/ui/label'
+ import { Dialog, DialogTitle, DialogContent } from '@mui/material'
+ import { useAgents } from '@/lib/context/AgentContext'
+-import {Agent, AgentFormData} from '@/lib/types'
++import { Agent, AgentFormData } from '@/lib/types'
+ 
+ interface AgentFormProps {
+   mode: 'add' | 'edit'
+@@ -15,17 +15,17 @@
+   onClose: () => void
+ }
+ 
+-function SubmitButton() {
++function SubmitButton({ mode }: { mode: 'add' | 'edit' }) {
+   const { pending } = useFormStatus()
+   return (
+     <Button type="submit" disabled={pending}>
+-      {pending ? 'Saving...' : 'Save'}
++      {pending ? 'Saving...' : mode === 'add' ? 'Add Agent' : 'Save Changes'}
+     </Button>
+   )
+ }
+ 
+ export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) {
+-  const { addAgent } = useAgents()
++  const { addAgent, updateAgent } = useAgents()
+ 
+   const submitAction = async (formData: FormData) => {
+     const data: AgentFormData = {
+@@ -34,7 +34,11 @@
+       status: formData.get('status') as 'active' | 'inactive',
+     }
+     
+-    await addAgent(data)
++    if (mode === 'edit' && initialData) {
++      await updateAgent(initialData.id, data)
++    } else {
++      await addAgent(data)
++    }
+     onClose()
+   }
+ 
+@@ -85,7 +89,7 @@
+             <Button type="button" variant="outline" onClick={onClose}>
+               Cancel
+             </Button>
+-            <SubmitButton />
++            <SubmitButton mode={mode} />
+           </div>
+         </form>
+       </DialogContent>
