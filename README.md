@@ -2,6 +2,9 @@
 
 A React application for managing a network of agents, built with TypeScript and Next.js.
 
+[![Watch Video](https://img.youtube.com/vi/mX08SQ1BFqI/0.jpg)](https://www.youtube.com/watch?v=mX08SQ1BFqI)
+
+
 ## Features Implementation Status
 
 | Feature | Status | Notes |
