@@ -18,7 +18,11 @@ interface AgentFormProps {
 function SubmitButton({ mode }: { mode: 'add' | 'edit' }) {
   const { pending } = useFormStatus()
   return (
-    <Button type="submit" disabled={pending}>
+    <Button 
+      type="submit" 
+      disabled={pending}
+      className="w-full sm:w-auto min-w-[100px]"
+    >
       {pending ? 'Saving...' : mode === 'add' ? 'Add Agent' : 'Save Changes'}
     </Button>
   )
@@ -48,45 +52,74 @@ export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) 
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      // todo: should be refactored
+      PaperProps={{
+        className: 'rounded-lg',
+        sx: {
+          margin: { xs: '16px', sm: '32px' },
+          width: { xs: 'calc(100% - 32px)', sm: 'calc(100% - 64px)' },
+          maxWidth: '600px',
+        }
+      }}
     >
-      <DialogTitle>
+      <DialogTitle className="text-xl sm:text-2xl font-bold px-6 pt-6">
         {mode === 'add' ? 'Add New Agent' : 'Edit Agent'}
       </DialogTitle>
-      <DialogContent>
-        <form action={submitAction} className="space-y-4 pt-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              name="name"
-              defaultValue={initialData?.name}
-              required
-            />
+      <DialogContent className="!pt-6">
+        <form action={submitAction} className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="name" className="text-sm font-medium">
+                Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                defaultValue={initialData?.name}
+                required
+                className="mt-1.5 w-full"
+                placeholder="Enter agent name"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="email" className="text-sm font-medium">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                defaultValue={initialData?.email}
+                required
+                className="mt-1.5 w-full"
+                placeholder="Enter agent email"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="status" className="text-sm font-medium">
+                Status
+              </Label>
+              <select
+                id="status"
+                name="status"
+                defaultValue={initialData?.status ?? 'active'}
+                className="mt-1.5 w-full px-3 py-2 bg-white border border-input rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              defaultValue={initialData?.email}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
-            <select
-              id="status"
-              name="status"
-              defaultValue={initialData?.status ?? 'active'}
-              className="w-full border rounded-md p-2"
+
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full sm:w-auto min-w-[100px]"
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <SubmitButton mode={mode} />

@@ -43,17 +43,90 @@ export default function Home() {
   )
 
   return (
-    <main className="container mx-auto py-10">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Agents Management</h1>
-        <div className="flex gap-4">
-          <Input
-            placeholder="Search by name or email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-[300px]"
-          />
-          <Button onClick={() => setShowForm(true)}>Add Agent</Button>
+    <main className="container mx-auto px-4 py-8">
+      <div className="space-y-6">
+        <header className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold">Agent Management</h1>
+          <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-4">
+            <Input
+              type="search"
+              placeholder="Search agents..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full sm:w-[300px]"
+            />
+            <Button 
+              onClick={() => setShowForm(true)}
+              className="w-full sm:w-auto"
+            >
+              Add Agent
+            </Button>
+          </div>
+        </header>
+
+        <div className="overflow-x-auto -mx-4 sm:mx-0 bg-white rounded-lg shadow">
+          <div className="min-w-full">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="hidden sm:table-cell">Name</TableHead>
+                  <TableHead className="hidden sm:table-cell">Email</TableHead>
+                  <TableHead className="hidden sm:table-cell">Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredAgents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-8">
+                      No agents found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredAgents.map((agent) => (
+                    <TableRow key={agent.id} className="sm:table-row flex flex-col sm:flex-row">
+                      <TableCell className="sm:table-cell">
+                        <span className="sm:hidden font-medium">Name: </span>
+                        {agent.name}
+                      </TableCell>
+                      <TableCell className="sm:table-cell">
+                        <span className="sm:hidden font-medium">Email: </span>
+                        {agent.email}
+                      </TableCell>
+                      <TableCell className="sm:table-cell">
+                        <span className="sm:hidden font-medium">Status: </span>
+                        <span className={`inline-flex px-2 py-1 rounded-full text-sm ${
+                          agent.status === 'active' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {agent.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="sm:table-cell flex flex-row space-x-3">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleEdit(agent)}
+                          className="flex-1 sm:flex-none"
+                        >
+                          Edit
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm"
+                          onClick={() => handleDelete(agent.id)}
+                          className="flex-1 sm:flex-none"
+                        >
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </div>
 
@@ -63,59 +136,6 @@ export default function Home() {
         open={showForm}
         onClose={handleCloseForm}
       />
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredAgents.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                No agents found matching your search criteria
-              </TableCell>
-            </TableRow>
-          ) : (
-            filteredAgents.map((agent) => (
-              <TableRow key={agent.id}>
-                <TableCell>{agent.name}</TableCell>
-                <TableCell>{agent.email}</TableCell>
-                <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-sm ${
-                    agent.status === 'active' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {agent.status}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="mr-2"
-                    onClick={() => handleEdit(agent)}
-                  >
-                    Edit
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => handleDelete(agent.id)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
     </main>
   )
 }

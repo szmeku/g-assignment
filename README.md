@@ -1,4 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Agent Management System
+
+A React application for managing a network of agents, built with TypeScript and Next.js.
+
+## Features Implementation Status
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| List Agents | ✅ Done | Displays name, email, and status |
+| Add Agent | ✅ Done | Form with validation |
+| Edit Agent | ✅ Done | Using same form component |
+| Delete Agent | ✅ Done | |
+| State Management | ✅ Done | Using React Context |
+| TypeScript | ✅ Done | Types implemented throughout |
+| Search/Filter | ✅ Done | Search by name or email |
+| Responsive Design | ✅ Done | Mobile-friendly UI |
+| API Integration | ✅ Done | Using jsonplaceholder.typicode.com |
+| Basic Tests | ✅ Done | Simple test implementation |
+| Redux Integration | 🚧 Pending | Planned for future |
+
+## Technical Highlights
+
+- **React 19 Features**: Implemented new React 19 features in state management
+- **TypeScript**: Full TypeScript implementation throughout the project
+- **API Integration**: Using jsonplaceholder for mock data
+- **Form Validation**: Basic validation implemented (could be improved)
+- **Testing**: Basic test coverage implemented
+
+## Areas for Improvement
+
+1. **Validation**: Form validation could be more robust
+2. **TypeScript**: Some types could be more strictly defined
+3. **ESLint Rules**: Could benefit from stricter ESLint configuration
+4. **Testing**: Test coverage could be expanded
 
 ## Getting Started
 
