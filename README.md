@@ -16,54 +16,37 @@ A React application for managing a network of agents, built with TypeScript and 
 | Responsive Design | ✅ Done | Mobile-friendly UI |
 | API Integration | ✅ Done | Using jsonplaceholder.typicode.com |
 | Basic Tests | ✅ Done | Simple test implementation |
-| Redux Integration | 🚧 Pending | Planned for future |
+| Redux Integration | 🚧 Pending | Didn't have enough time |
 
 ## Technical Highlights
 
-- **React 19 Features**: Implemented new React 19 features in state management
+- **React 19 Features**: I utilized newest react 19 features
+  - [View commit details](https://github.com/szmeku/g-assignment/commit/a099269149eb8a62b260c8d800e28e9f2a631a14)
 - **TypeScript**: Full TypeScript implementation throughout the project
 - **API Integration**: Using jsonplaceholder for mock data
 - **Form Validation**: Basic validation implemented (could be improved)
-- **Testing**: Basic test coverage implemented
+- **Testing**: Basic test example for edit form
 
 ## Areas for Improvement
 
-1. **Validation**: Form validation could be more robust
+1. **Validation**: Just basic validation implemented
 2. **TypeScript**: Some types could be more strictly defined
 3. **ESLint Rules**: Could benefit from stricter ESLint configuration
 4. **Testing**: Test coverage could be expanded
 
-## Getting Started
-
-First, run the development server:
+## First, run the development server
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+next dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tests & Linting
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm test
+next lint
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Changes history
+- https://github.com/szmeku/g-assignment/commits/main/
