@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogTitle, DialogContent } from '@mui/material'
 import { useAgents } from '@/lib/context/AgentContext'
-import {Agent, AgentFormData} from '@/lib/types'
+import { Agent, AgentFormData } from '@/lib/types'
 
 interface AgentFormProps {
   mode: 'add' | 'edit'
@@ -15,17 +15,17 @@ interface AgentFormProps {
   onClose: () => void
 }
 
-function SubmitButton() {
+function SubmitButton({ mode }: { mode: 'add' | 'edit' }) {
   const { pending } = useFormStatus()
   return (
     <Button type="submit" disabled={pending}>
-      {pending ? 'Saving...' : 'Save'}
+      {pending ? 'Saving...' : mode === 'add' ? 'Add Agent' : 'Save Changes'}
     </Button>
   )
 }
 
 export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) {
-  const { addAgent } = useAgents()
+  const { addAgent, updateAgent } = useAgents()
 
   const submitAction = async (formData: FormData) => {
     const data: AgentFormData = {
@@ -34,7 +34,11 @@ export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) 
       status: formData.get('status') as 'active' | 'inactive',
     }
     
-    await addAgent(data)
+    if (mode === 'edit' && initialData) {
+      await updateAgent(initialData.id, data)
+    } else {
+      await addAgent(data)
+    }
     onClose()
   }
 
@@ -85,7 +89,7 @@ export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) 
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <SubmitButton />
+            <SubmitButton mode={mode} />
           </div>
         </form>
       </DialogContent>
