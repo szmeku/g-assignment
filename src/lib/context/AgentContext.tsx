@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, useActionState, useOptimistic, startTransition } from 'react'
+import { createContext, useContext, useState, useEffect, useTransition } from 'react'
 import { Agent, AgentFormData } from '../types'
 import { api } from '../api'
 
@@ -19,108 +19,77 @@ const AgentContext = createContext<AgentContextType | undefined>(undefined)
 
 export function AgentProvider({ children }: { children: React.ReactNode }) {
   const [agents, setAgents] = useState<Agent[]>([])
-  const [optimisticAgents, setOptimisticAgents] = useOptimistic(agents)
-  
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
 
-  const [addError, addAction, isAddPending] = useActionState<string | null, AgentFormData>(
-    async (state, formData) => {
+  const performAction = async <T,>(
+    operation: () => Promise<T>,
+    successCallback: (result: T) => void
+  ) => {
+    startTransition(async () => {
       try {
-        const newAgent = await api.createAgent(formData)
-        setAgents(prev => [...prev, newAgent])
-        return null
+        await operation().then(successCallback)
+        setError(null)
       } catch (err) {
-        return String(err)
+        console.error(err)
+        setError('Operation failed')
       }
-    },
-    null
-  )
-
-  const [updateError, updateAction, isUpdatePending] = useActionState<string | null, { id: string; data: AgentFormData }>(
-    async (state, { id, data }) => {
-      try {
-        const updatedAgent = await api.updateAgent(id, data)
-        setAgents(prev => prev.map(agent => 
-          agent.id === id ? updatedAgent : agent
-        ))
-        return null
-      } catch (err){
-        return String(err)
-      }
-    },
-    null
-  )
-  
-  const [deleteError, deleteAction, isDeletePending] = useActionState<string | null, string>(
-    async (state, id) => {
-      try {
-        await api.deleteAgent(id)
-        setAgents(prev => prev.filter(agent => agent.id !== id))
-        return null
-      } catch (err) {
-        return String(err)
-      }
-    },
-    null
-  )
+    })
+  }
 
   useEffect(() => {
-    const fetchAgents = async () => {
-      try {
-        const data = await api.getAgents()
-        setAgents(data)
-      } catch (err) {
-        console.error('Failed to fetch agents:', err)
-      }
-    }
-    fetchAgents()
+    performAction(
+      () => api.getAgents(),
+      (data) => setAgents(data)
+    )
   }, [])
 
   const addAgent = async (data: AgentFormData) => {
-    startTransition(() => {
-      setOptimisticAgents(prev => [...prev, { ...data, id: 'temp-id' } as Agent])
-      addAction(data)
-    })
+    await performAction(
+      () => api.createAgent(data),
+      (newAgent) => setAgents(prev => [...prev, newAgent])
+    )
   }
 
   const updateAgent = async (id: string, data: AgentFormData) => {
-    startTransition(() => {
-      setOptimisticAgents(prev => 
-        prev.map(agent => agent.id === id ? { ...agent, ...data } : agent)
+    await performAction(
+      () => api.updateAgent(id, data),
+      (updatedAgent) => setAgents(prev => 
+        prev.map(agent => agent.id === id ? updatedAgent : agent)
       )
-      updateAction({ id, data })
-    })
+    )
   }
 
   const deleteAgent = async (id: string) => {
-    startTransition(() => {
-      setOptimisticAgents(prev => prev.filter(agent => agent.id !== id))
-      deleteAction(id)
-    })
+    await performAction(
+      () => api.deleteAgent(id),
+      () => setAgents(prev => prev.filter(agent => agent.id !== id))
+    )
   }
 
-  const getAgent = (id: string) => optimisticAgents.find(agent => agent.id === id)
+  const getAgent = (id: string) => {
+    return agents.find(agent => agent.id === id)
+  }
 
   const searchAgents = (query: string) => {
-    if (!query) return optimisticAgents
+    if (!query) return agents
+    
     const lowercaseQuery = query.toLowerCase()
-    return optimisticAgents.filter(agent => 
+    return agents.filter(agent => 
       agent.name.toLowerCase().includes(lowercaseQuery) ||
       agent.email.toLowerCase().includes(lowercaseQuery)
     )
   }
 
-  const loading = isAddPending || isUpdatePending || isDeletePending
-  const error = addError || updateError || deleteError
-
   return (
     <AgentContext.Provider value={{ 
-      agents: optimisticAgents,
+      agents, 
       addAgent, 
       updateAgent, 
       deleteAgent, 
       getAgent,
       searchAgents,
-      loading,
+      loading: isPending,
       error
     }}>
       {children}

@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogTitle, DialogContent } from '@mui/material'
 import { useAgents } from '@/lib/context/AgentContext'
-import { Agent, AgentFormData } from '@/lib/types'
+import {Agent, AgentFormData} from '@/lib/types'
 
 interface AgentFormProps {
   mode: 'add' | 'edit'
@@ -15,21 +15,26 @@ interface AgentFormProps {
   onClose: () => void
 }
 
-export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) {
-  const { addAgent, updateAgent } = useAgents()
-  const [formData, setFormData] = useState<AgentFormData>({
-    name: initialData?.name ?? '',
-    email: initialData?.email ?? '',
-    status: initialData?.status ?? 'active'
-  })
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? 'Saving...' : 'Save'}
+    </Button>
+  )
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (mode === 'add') {
-      addAgent(formData)
-    } else if (initialData) {
-      updateAgent(initialData.id, formData)
+export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) {
+  const { addAgent } = useAgents()
+
+  const submitAction = async (formData: FormData) => {
+    const data: AgentFormData = {
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      status: formData.get('status') as 'active' | 'inactive',
     }
+    
+    await addAgent(data)
     onClose()
   }
 
@@ -44,13 +49,13 @@ export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) 
         {mode === 'add' ? 'Add New Agent' : 'Edit Agent'}
       </DialogTitle>
       <DialogContent>
-        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+        <form action={submitAction} className="space-y-4 pt-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
-              value={formData.name}
-              onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              name="name"
+              defaultValue={initialData?.name}
               required
             />
           </div>
@@ -58,9 +63,9 @@ export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) 
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
+              name="email"
               type="email"
-              value={formData.email}
-              onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              defaultValue={initialData?.email}
               required
             />
           </div>
@@ -68,8 +73,8 @@ export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) 
             <Label htmlFor="status">Status</Label>
             <select
               id="status"
-              value={formData.status}
-              onChange={e => setFormData(prev => ({ ...prev, status: e.target.value as 'active' | 'inactive' }))}
+              name="status"
+              defaultValue={initialData?.status ?? 'active'}
               className="w-full border rounded-md p-2"
             >
               <option value="active">Active</option>
@@ -80,9 +85,7 @@ export function AgentForm({ mode, initialData, open, onClose }: AgentFormProps) 
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">
-              {mode === 'add' ? 'Add Agent' : 'Save Changes'}
-            </Button>
+            <SubmitButton />
           </div>
         </form>
       </DialogContent>
